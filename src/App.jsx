@@ -4,9 +4,9 @@ import {
   PieChart, Pie, Cell, CartesianGrid
 } from "recharts";
 
-const DEFAULT_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1dmg0TkNUSTZMRFBmdEpTb0ZzNTd2dXB1M0o2blpvaFdpMGhqTlZjWndRIn0.eyJleHAiOjE3NzMzMDkyNTUsImlhdCI6MTc3MzMwMjA1NSwiYXV0aF90aW1lIjoxNzczMjg3NTc3LCJqdGkiOiJvbnJ0cnQ6YjZiZDgzMDMtMTIzMi00ZGE3LWFlNmEtNDU5YWQ1YmQ0NDIxIiwiaXNzIjoiaHR0cHM6Ly9rZXljbG9hay51YXQuZXUuY29oZXJlbnQuZ2xvYmFsL2F1dGgvcmVhbG1zL2VtZWEtc2FsZXMiLCJhdWQiOlsicHJvZHVjdC1mYWN0b3J5IiwicmVhbG0tbWFuYWdlbWVudCJdLCJzdWIiOiJlYzlkOWQzZS04YjY3LTQ2MDEtYjhhYi1lNmQxYmEyMDBjNTQiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwcm9kdWN0LWZhY3RvcnkiLCJzaWQiOiIyYmIwNDU4Yy01NTdhLTRiNTItYjI3Yi0zODlhZjk1OGQ3NjUiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9hc3Npc3RhbnQuZXh0LmNvaGVyZW50Lmdsb2JhbCIsImh0dHBzOi8vY2hhdC5vcGVuYWkuY29tIiwiaHR0cHM6Ly9hbGhycy1yYXRlci1teXMudmVyY2VsLmFwcC8iLCJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJodHRwczovL2FsaHJzcmF0ZXJteXMtcGZqZC0tNTE3My0tODIyMjg5NmMubG9jYWwtY3JlZGVudGlhbGxlc3Mud2ViY29udGFpbmVyLmlvIiwiaHR0cHM6Ly9tb2RlbGluZy1jZW50ZXIuZGV2LmNvaGVyZW50Lmdsb2JhbCIsImh0dHBzOi8vbW9kZWxpbmctY2VudGVyLnVzLmNvaGVyZW50Lmdsb2JhbCIsImh0dHBzOi8vYXNzaXN0YW50LnN0YWdpbmcuY29oZXJlbnQuZ2xvYmFsIiwiaHR0cDovL2xvY2FsaG9zdDozMDAwLyoiLCJodHRwczovL3NhLnN0YWdpbmcuY29oZXJlbnQuZ2xvYmFsIiwiaHR0cHM6Ly9hbGhyc3JhdGVybXlzLXBmamQtLTUxNzMtLTgyMjI4OTZjLmxvY2FsLWNyZWRlbnRpYWxsZXNzLndlYmNvbnRhaW5lci5pby8iLCJodHRwczovL3NwYXJrLXVzZXItbWFuYWdlci51YXQuZXUuY29oZXJlbnQuZ2xvYmFsIiwiaHR0cHM6Ly9hbGhycy1yYXRlci1teXMudmVyY2VsLmFwcCIsImh0dHBzOi8vbW9kZWxpbmctY2VudGVyLnN0YWdpbmcuY29oZXJlbnQuZ2xvYmFsIiwiaHR0cHM6Ly9zcGFyay51YXQuZXUuY29oZXJlbnQuZ2xvYmFsIl0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsInF1ZXJ5LWNsaWVudHMiLCJtYW5hZ2UtY2xpZW50cyIsInF1ZXJ5LWdyb3VwcyIsInF1ZXJ5LXVzZXJzIl19LCJwcm9kdWN0LWZhY3RvcnkiOnsicm9sZXMiOlsidGVuYW50LWFkbWluIl19fSwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBzcGFyayIsIm5hbWUiOiJCYXNzZWwgSmlyYWJlIiwiZ3JvdXBzIjpbImJpbGxpbmctdmlld2VyIiwic3VwZXJ2aXNvcjpwZiIsInRlbmFudC1hZG1pbiIsInVzZXI6cGYiXSwicmVhbG0iOiJlbWVhLXNhbGVzIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYmFzc2VsLmppcmFiZUBjb2hlcmVudC5nbG9iYWwiLCJnaXZlbl9uYW1lIjoiQmFzc2VsIiwiZmFtaWx5X25hbWUiOiJKaXJhYmUiLCJ1c2VyX2NyZWF0ZWRfdGltZXN0YW1wIjoxNzAwODI3NTI5ODkwLCJyZWxhdGlvbiI6ImN1c3RvbWVyIn0.hS-NQ9L_z-Z30K8S1SbKDT1bUOm7__nyPKIVjpYItE_2XzqQtYI1Uu5ZWzK6xe8Czk0aYRBFGblZ6_EGfS_zMmx1J9PbyA5lEkxuoYpGeWJLFZzf8fIftU2GoQTdXzSxBCJRvYNrLgO-hjpM_MPfSYUYwT3K5qKdkqV0Fz4wcWiJe7SpMMWi0PNe9TsOlSqTQ3-v4Q4Zeuf0cFv6QHMEnzfZO7PUn93E-yRJ3mF1kFVysSd1t_tRvIMb53LR2Mxpx1CsjiZ7_wd_Td56YB0niVf6p6DFTARDhFPSxBVlWnjcBy5061x9_1SmkoGHfTrcvrG-WoZWt6fEUZeDfVnJxQ";
-const BASE_URL       = "https://excel.uat.eu.coherent.global/api/v1/Product/ALHRS/engines/Spark%20-%20ALHRS%20Pricer%20(MYS)/logs/";
-const TOTAL_COUNT_URL = "https://excel.uat.eu.coherent.global/emea-sales/api/v3/folders/ALHRS/services/Spark%20-%20ALHRS%20Pricer%20(MYS)/log/gettotalcount/";
+const DEFAULT_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJiWFFYOFk4YVlEMHVBZldLYnZBNnFEMVhmbzF6Y0ZZblNoR3h3ekF5UFRNIn0.eyJleHAiOjE3NzMzMjMyMDIsImlhdCI6MTc3MzMxNjAwMiwiYXV0aF90aW1lIjoxNzczMzE2MDAwLCJqdGkiOiJvbnJ0YWM6OGU0NjkzN2UtMjM1Mi00OTY4LWE3ODMtMTA3YjBiZjIwNDhiIiwiaXNzIjoiaHR0cHM6Ly9rZXljbG9hay51YXQuanAuY29oZXJlbnQuZ2xvYmFsL2F1dGgvcmVhbG1zL2FsaHJzIiwiYXVkIjpbInByb2R1Y3QtZmFjdG9yeSIsInJlYWxtLW1hbmFnZW1lbnQiXSwic3ViIjoiNjk2NTMyNGQtOWE2NC00MDkxLWI5NzMtNzlmMTBiYzZkYTk5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoicHJvZHVjdC1mYWN0b3J5Iiwic2lkIjoiODZlOTg4YWMtMjQ1Ni00Njk0LTllYWMtMjI2Y2RlOTE4OGFmIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwczovL21vZGVsaW5nLWNlbnRlci5kZXYuY29oZXJlbnQuZ2xvYmFsIiwiaHR0cHM6Ly9tb2RlbGluZy1jZW50ZXIudXMuY29oZXJlbnQuZ2xvYmFsIiwiaHR0cHM6Ly9hc3Npc3RhbnQuc3RhZ2luZy5jb2hlcmVudC5nbG9iYWwiLCJodHRwczovL2Fzc2lzdGFudC5leHQuY29oZXJlbnQuZ2xvYmFsIiwiaHR0cHM6Ly9zYS5zdGFnaW5nLmNvaGVyZW50Lmdsb2JhbCIsImh0dHBzOi8vc3BhcmsudWF0LmpwLmNvaGVyZW50Lmdsb2JhbCIsImh0dHBzOi8vc3BhcmstdXNlci1tYW5hZ2VyLnVhdC5qcC5jb2hlcmVudC5nbG9iYWwiLCJodHRwczovL21vZGVsaW5nLWNlbnRlci5zdGFnaW5nLmNvaGVyZW50Lmdsb2JhbCJdLCJyZXNvdXJjZV9hY2Nlc3MiOnsicmVhbG0tbWFuYWdlbWVudCI6eyJyb2xlcyI6WyJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsInZpZXctcmVhbG0iLCJtYW5hZ2UtaWRlbnRpdHktcHJvdmlkZXJzIiwiY3JlYXRlLWNsaWVudCIsIm1hbmFnZS11c2VycyIsInF1ZXJ5LXJlYWxtcyIsInZpZXctdXNlcnMiLCJ2aWV3LWNsaWVudHMiLCJxdWVyeS1jbGllbnRzIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiLCJxdWVyeS11c2VycyJdfSwicHJvZHVjdC1mYWN0b3J5Ijp7InJvbGVzIjpbInRlbmFudC1hZG1pbiJdfX0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgc3BhcmsiLCJuYW1lIjoiQmFzc2VsIEppcmFiZSIsImdyb3VwcyI6WyJ0ZW5hbnQtYWRtaW4iLCJ1c2VyOnBmIl0sInJlYWxtIjoiYWxocnMiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJiYXNzZWwuamlyYWJlQGNvaGVyZW50Lmdsb2JhbCIsImdpdmVuX25hbWUiOiJCYXNzZWwiLCJmYW1pbHlfbmFtZSI6IkppcmFiZSIsInVzZXJfY3JlYXRlZF90aW1lc3RhbXAiOjE3NzA3MDg2MDY5NzIsInJlbGF0aW9uIjoiY3VzdG9tZXIifQ.N9IZfF56LL-8_O4bcmY63ApgpQ_AZ6mciNIUh4_YwPuBghkzfas9owBkUWHxXmgvaSy3Lo58gRAVqRyeExsDSI5LtusXv21yWWTK8OV_NGirGkESjT4fu-P_Ueo1JKVuKa6tbKm4icPl8FI--X_Ufjh2wkox5JNtInlES8ejiwo53Su6KiffyUSRubk8vJztu9UHXrvB_0aVs7SqoAlw-yXmjq9WLqzQtcsvtRdyAop-rIbHTpzVKcwMW4931fWQ0cYPunL1XMCABsbXAWefYEqxGFfsoHZV3dAFBHdWPcW6G4MnEseqrWSDLrhxzJ3Lgdj6XtUGeQVVTaStOKpO0Q";
+const BASE_URL       = "https://excel.uat.jp.coherent.global/api/v1/Product/ALHRS-Demo/engines/Rater%20(MYS)/logs/";
+const TOTAL_COUNT_URL = "https://excel.uat.jp.coherent.global/alhrs/api/v3/folders/ALHRS-Demo/services/Rater%20(MYS)/log/gettotalcount/";
 const AXA_LOGO = "/AXA_Logo.png";
 const COHERENT_LOGO = "/coherent-logo.png";
 
@@ -332,7 +332,7 @@ function Badge({ text }) {
 }
 
 // ─── Execution Detail Modal ───────────────────────────────────────────────────
-const EXEC_URL = id => `https://excel.uat.eu.coherent.global/emea-sales/api/v3/log/getexecutionhistorybyid/${id}`;
+const EXEC_URL = id => `https://excel.uat.jp.coherent.global/alhrs/api/v3/log/getexecutionhistorybyid/${id}`;
 
 // ─── Rater-style read-only primitives ─────────────────────────────────────────
 const MN = { // Modal Navy palette matching rater
@@ -727,7 +727,7 @@ function ExecutionModal({ logId, engineCallId, callPurpose, token, onClose }) {
       setLoading(true); setError(null); setData(null);
       try {
         const res = await fetch(EXEC_URL(logId), {
-          headers: { Authorization:`Bearer ${token}`, "x-tenant-name":"emea-sales", accept:"*/*", "content-type":"application/json" }
+          headers: { Authorization:`Bearer ${token}`, "x-tenant-name":"alhrs", accept:"*/*", "content-type":"application/json" }
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
@@ -906,13 +906,13 @@ function ExecutionModal({ logId, engineCallId, callPurpose, token, onClose }) {
   async function handleDownloadExcel() {
     if (!data) return;
     const callId = resolvedEngineCallId || logId;
-    const EXCEL_URL = `https://excel.uat.eu.coherent.global/api/v1/product/ALHRS/engines/Spark%20-%20ALHRS%20Pricer%20(MYS)/logs/Download/xml/${callId}`;
+    const EXCEL_URL = `https://excel.uat.jp.coherent.global/api/v1/product/ALHRS-Demo/engines/Rater%20(MYS)/logs/Download/xml/${callId}`;
     try {
       const res = await fetch(EXCEL_URL, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
-          "x-tenant-name": "emea-sales",
+          "x-tenant-name": "alhrs",
           "accept": "*/*",
           "content-type": "application/json",
         },
@@ -1154,7 +1154,7 @@ export default function ALHRSDashboard() {
   const fetchLogs = useCallback(async () => {
     setLoading(true); setFetchError(null);
     const cleanToken = tokenValueRef.current.replace(/^Bearer\s+/i, "").trim();
-    const headers = { "Content-Type":"application/json", Authorization:`Bearer ${cleanToken}`, "x-tenant-name":"emea-sales" };
+    const headers = { "Content-Type":"application/json", Authorization:`Bearer ${cleanToken}`, "x-tenant-name":"alhrs" };
     const searchPayload = {
       page:1, pageSize:100, sort:"-updated",
       search:[
@@ -1327,7 +1327,7 @@ export default function ALHRSDashboard() {
               ALHRS Intelligence Dashboard
             </div>
             <div style={{ fontSize:12, color:C.muted, marginTop:3, letterSpacing:"0.01em" }}>
-              emea-sales · UAT · Spark - ALHRS Pricer (MYS)
+              alhrs · UAT · Rater (MYS)
             </div>
           </div>
         </div>
