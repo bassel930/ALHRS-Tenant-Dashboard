@@ -344,6 +344,62 @@ const MN = { // Modal Navy palette matching rater
   amber:"#F59E0B", amberLight:"#FFFBEB",
 };
 
+// ─── Horizontal scroller with visible affordances ──────────────────────────
+function HScroll({ children, style, maxHeight }) {
+  const ref = useRef(null);
+  const [canLeft, setCanLeft]   = useState(false);
+  const [canRight, setCanRight] = useState(false);
+
+  const update = () => {
+    const el = ref.current; if (!el) return;
+    setCanLeft(el.scrollLeft > 2);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+  };
+
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => { el.removeEventListener("scroll", update); ro.disconnect(); };
+  }, [children]);
+
+  const scrollBy = (dx) => {
+    const el = ref.current; if (!el) return;
+    el.scrollBy({ left: dx, behavior: "smooth" });
+  };
+
+  const btn = (side) => ({
+    position: "absolute", top: "50%", [side]: 4, transform: "translateY(-50%)",
+    width: 30, height: 30, borderRadius: "50%",
+    background: MN.white, border: `1px solid ${MN.mid}`,
+    boxShadow: "0 2px 8px rgba(30,30,92,0.18)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    cursor: "pointer", color: MN.navy, fontSize: 16, fontWeight: 700,
+    zIndex: 3, userSelect: "none",
+  });
+
+  return (
+    <div style={{ position: "relative", ...(style || {}) }}>
+      <div
+        ref={ref}
+        className="hscroll-track"
+        style={{
+          overflowX: "auto",
+          overflowY: maxHeight ? "auto" : "visible",
+          maxHeight: maxHeight || undefined,
+        }}
+      >
+        {children}
+      </div>
+      {canLeft  && <button type="button" onClick={() => scrollBy(-240)} style={btn("left")}  aria-label="Scroll left">‹</button>}
+      {canRight && <button type="button" onClick={() => scrollBy(240)}  style={btn("right")} aria-label="Scroll right">›</button>}
+    </div>
+  );
+}
+
 function MLabel({ children }) {
   return <div style={{ fontSize:10, fontWeight:600, color:MN.muted, letterSpacing:"0.07em",
     textTransform:"uppercase", marginBottom:5 }}>{children}</div>;
@@ -411,6 +467,7 @@ function ModalInputsTab({ inp }) {
     <>
       <MCard title="Client Information" subtitle="Client and policy identification">
         <MGrid>
+          <MField label="Reference No"            value={inp.Input_Ref_No}/>
           <MField label="Name of Client"          value={inp.InputTab_Name_Of_Client}/>
           <MField label="Nature of Business"       value={inp.InputTab_Nature_Of_Business}/>
           <MField label="New / Renewal Business"   value={inp.Claims_New_Business}/>
@@ -439,7 +496,6 @@ function ModalInputsTab({ inp }) {
           <MField label="Insurer Fee"                 value={inp.Claims_Insurer_Fee != null ? `${(Number(inp.Claims_Insurer_Fee)*100).toFixed(2)}%` : null}/>
           <MField label="Agent Commission"            value={inp.Claims_Agent_Commission != null ? `${(Number(inp.Claims_Agent_Commission)*100).toFixed(2)}%` : null}/>
           <MField label="Retro Commission / Wakalah Fee" value={inp.InputTab_Retro_commission_Wakalah_Fee != null ? `${(Number(inp.InputTab_Retro_commission_Wakalah_Fee)*100).toFixed(2)}%` : null}/>
-          <MField label="Expected GWP (MYR)"          value={fmtNum(inp.expected_GWP)}/>
         </MGrid3>
       </MCard>
     </>
@@ -503,7 +559,7 @@ function ModalCensusTab({ rows }) {
   const cols = Object.keys(rows[0]);
   return (
     <MCard title="Member Census" subtitle={`${rows.length} member${rows.length!==1?"s":""} loaded`}>
-      <div style={{ overflowX:"auto", borderRadius:8, border:`1px solid ${MN.mid}`, maxHeight:400, overflowY:"auto" }}>
+      <HScroll maxHeight={400} style={{ borderRadius:8, border:`1px solid ${MN.mid}` }}>
         <table style={{ borderCollapse:"collapse", fontSize:11, minWidth:"100%" }}>
           <thead style={{ position:"sticky", top:0, zIndex:2 }}>
             <tr>{cols.map(h => <th key={h} style={th}>{h}</th>)}</tr>
@@ -514,7 +570,7 @@ function ModalCensusTab({ rows }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </HScroll>
     </MCard>
   );
 }
@@ -536,7 +592,7 @@ function ModalTOBTab({ rows }) {
 
   return (
     <MCard title="Benefits Configuration" subtitle="Table of Benefits — plan limits in MYR">
-      <div style={{ overflowX:"auto", borderRadius:8, border:`1px solid ${MN.mid}`, maxHeight:500, overflowY:"auto" }}>
+      <HScroll maxHeight={500} style={{ borderRadius:8, border:`1px solid ${MN.mid}` }}>
         <table style={{ borderCollapse:"collapse", fontSize:11, minWidth:"100%" }}>
           <thead style={{ position:"sticky", top:0, zIndex:2 }}>
             <tr>
@@ -570,7 +626,7 @@ function ModalTOBTab({ rows }) {
             })}
           </tbody>
         </table>
-      </div>
+      </HScroll>
     </MCard>
   );
 }
@@ -582,7 +638,7 @@ function MPlanTable({ title, data, numPlans }) {
   return (
     <div style={{ marginBottom:20 }}>
       <div style={{ fontSize:11, fontWeight:700, color:MN.navy, marginBottom:8, textTransform:"uppercase", letterSpacing:"0.05em" }}>{title}</div>
-      <div style={{ overflowX:"auto" }}>
+      <HScroll>
         <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12 }}>
           <thead>
             <tr style={{ background:MN.navy }}>
@@ -607,7 +663,7 @@ function MPlanTable({ title, data, numPlans }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </HScroll>
     </div>
   );
 }
@@ -620,6 +676,7 @@ function ModalOutputTab({ outputs }) {
 
   const kpis = [
     { label:"Total GWP (Claims)", value: outputs.Claims_Total_GWP,                              fmt:"currency" },
+    { label:"Total Book Rates",   value: outputs.Claims_ExpectedGWP_Book_Rated,                 fmt:"currency" },
     { label:"Total Lives",        value: outputs.InputTab_Total_nb_Lives,                        fmt:"int"      },
     { label:"Total Employees",    value: outputs.InputTab_Total_Nb_Employees,                    fmt:"int"      },
     { label:"Total Plans",        value: outputs.InputTab_Total_Nb_Plans,                        fmt:"int"      },
@@ -710,6 +767,45 @@ function ModalOutputTab({ outputs }) {
           <MPlanTable title="Plan Benefits" data={outputs.InputTab_Plan_Selection} numPlans={numPlans}/>
         </MCard>
       )}
+
+      {/* Quote Documents — Spark-generated PDFs by plan count */}
+      {(outputs["5PLANS"]?.PDFUrl || outputs["10PLANS"]?.PDFUrl || outputs["15PLANS"]?.PDFUrl || outputs["20PLANS"]?.PDFUrl) && (() => {
+        const docs = [
+          { key: "5PLANS",  label: "Quote — 5 Plans",  icon: "📄", color: "#1A4A7A" },
+          { key: "10PLANS", label: "Quote — 10 Plans", icon: "📋", color: "#005C3A" },
+          { key: "15PLANS", label: "Quote — 15 Plans", icon: "📑", color: "#7A3A00" },
+          { key: "20PLANS", label: "Quote — 20 Plans", icon: "📊", color: "#5B2C6F" },
+        ].filter(d => outputs[d.key]?.PDFUrl);
+
+        return (
+          <MCard title="Quote Documents" subtitle="Download the Spark-generated quote PDFs by plan count">
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+              {docs.map(doc => {
+                const pdf = outputs[doc.key];
+                return (
+                  <a
+                    key={doc.key}
+                    href={pdf.PDFUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={pdf.PDFName || undefined}
+                    title={pdf.PDFName || doc.label}
+                    style={{ display:"flex", alignItems:"center", gap:10, background:doc.color, color:MN.white,
+                      borderRadius:10, padding:"12px 18px", textDecoration:"none",
+                      minWidth:180, flex:1, maxWidth:300 }}
+                  >
+                    <span style={{ fontSize:24, flexShrink:0 }}>{doc.icon}</span>
+                    <div style={{ minWidth:0 }}>
+                      <div style={{ fontSize:12, fontWeight:700 }}>{doc.label}</div>
+                      <div style={{ fontSize:10, opacity:0.85, marginTop:2 }}>⬇ Download PDF</div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </MCard>
+        );
+      })()}
     </>
   );
 }
@@ -774,7 +870,7 @@ function ExecutionModal({ logId, engineCallId, callPurpose, token, onClose }) {
   ]);
   // Pricing-related Claims_ fields that belong in the Inputs tab, not Claims Experience
   const INPUTS_CLAIMS_KEYS = new Set([
-    "Claims_Insurer_Fee","Claims_Agent_Commission","Claims_Beginning","Claims_End","Claims_New_Business","InputTab_Retro_commission_Wakalah_Fee","expected_GWP",
+    "Claims_Insurer_Fee","Claims_Agent_Commission","Claims_Beginning","Claims_End","Claims_New_Business","InputTab_Retro_commission_Wakalah_Fee",
   ]);
   const sectionInputs = {}, sectionClaims = {};
   Object.entries(rawInputs).forEach(([k,v]) => {
@@ -1301,7 +1397,15 @@ export default function ALHRSDashboard() {
   return (
     <div style={{ background:C.bg, minHeight:"100vh", fontFamily:"'Inter',-apple-system,sans-serif", color:C.text, display:"flex", flexDirection:"column" }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-      <style>{`* { box-sizing:border-box; } @keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <style>{`
+        * { box-sizing:border-box; }
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .hscroll-track { scrollbar-width: thin; scrollbar-color: #B8B8D0 #F0F0F8; }
+        .hscroll-track::-webkit-scrollbar { height: 10px; -webkit-appearance: none; }
+        .hscroll-track::-webkit-scrollbar-track { background: #F0F0F8; border-radius: 5px; }
+        .hscroll-track::-webkit-scrollbar-thumb { background: #B8B8D0; border-radius: 5px; border: 2px solid #F0F0F8; }
+        .hscroll-track::-webkit-scrollbar-thumb:hover { background: #9898B8; }
+      `}</style>
 
       {/* ── Header ── */}
       <div style={{ background:C.white, borderBottom:`1px solid ${C.border}`, padding:"0 40px",
@@ -1705,7 +1809,14 @@ export default function ALHRSDashboard() {
         />
       )}
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hscroll-track { scrollbar-width: thin; scrollbar-color: #B8B8D0 #F0F0F8; }
+        .hscroll-track::-webkit-scrollbar { height: 10px; -webkit-appearance: none; }
+        .hscroll-track::-webkit-scrollbar-track { background: #F0F0F8; border-radius: 5px; }
+        .hscroll-track::-webkit-scrollbar-thumb { background: #B8B8D0; border-radius: 5px; border: 2px solid #F0F0F8; }
+        .hscroll-track::-webkit-scrollbar-thumb:hover { background: #9898B8; }
+      `}</style>
     </div>
   );
 }
